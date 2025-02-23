@@ -70,5 +70,18 @@ namespace MixerNet.Controller
         public async Task<float> GetInputMultiplier(string input) => await GetInputMultiplier(ParseChannel(input));
         public async Task<float> GetOutputMultiplier(int output) => (await mixer.CommandAsync($"/ch/{output}/multiplier")).As<float>();
         public async Task<float> GetOutputMultiplier(string output) => await GetOutputMultiplier(ParseBus(output));
+
+        public async Task<Tuple<float, float, float>> GetInputLevels(int input) {
+            var bundle = await mixer.CommandAsync($"/ch/{input}/levels") as OscBundle;
+
+            return new Tuple<float,float,float>(bundle.Messages[0].As<float>(), bundle.Messages[1].As<float>(), bundle.Messages[2].As<float>());
+        }
+
+        public async Task<Tuple<float, float, float>> GetOutputLevels(int output)
+        {
+            var bundle = await mixer.CommandAsync($"/bus/{output}/levels") as OscBundle;
+
+            return new Tuple<float, float, float>(bundle.Messages[0].As<float>(), bundle.Messages[1].As<float>(), bundle.Messages[2].As<float>());
+        }
     }
 }

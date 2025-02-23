@@ -59,6 +59,10 @@ namespace MixerNet.Cli
             argument.AddValidator(a => predicate(a.GetValueForArgument(argument)).Validate(a, format));
             return argument;
         }
+
+        public static async Task<List<T>> ToListAsync<T>(this Task<IEnumerable<T>> ie) {
+            return (await ie).ToList();
+        }
     }
 
 
