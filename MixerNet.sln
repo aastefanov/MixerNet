@@ -1,0 +1,43 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.13.35818.85
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixerNet.Controller", "MixerNet.Controller\MixerNet.Controller.csproj", "{68BDC45D-FE52-4859-8FBB-F3577820CB1A}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixerNet.Cli", "MixerNet.Cli\MixerNet.Cli.csproj", "{03A1F536-AF20-467C-8823-9924F7B959B3}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixerNet.Avalonia", "MixerNet.Avalonia\MixerNet.Avalonia.csproj", "{7B51F0E6-8B1D-9FDF-EC5F-01F73D8466D4}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MixerNet.Avalonia.Desktop", "MixerNet.Avalonia.Desktop\MixerNet.Avalonia.Desktop.csproj", "{784737E0-6E48-491D-6AFA-A4A4F3C135A4}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{68BDC45D-FE52-4859-8FBB-F3577820CB1A}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{68BDC45D-FE52-4859-8FBB-F3577820CB1A}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{68BDC45D-FE52-4859-8FBB-F3577820CB1A}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{68BDC45D-FE52-4859-8FBB-F3577820CB1A}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03A1F536-AF20-467C-8823-9924F7B959B3}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03A1F536-AF20-467C-8823-9924F7B959B3}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03A1F536-AF20-467C-8823-9924F7B959B3}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03A1F536-AF20-467C-8823-9924F7B959B3}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7B51F0E6-8B1D-9FDF-EC5F-01F73D8466D4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7B51F0E6-8B1D-9FDF-EC5F-01F73D8466D4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7B51F0E6-8B1D-9FDF-EC5F-01F73D8466D4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7B51F0E6-8B1D-9FDF-EC5F-01F73D8466D4}.Release|Any CPU.Build.0 = Release|Any CPU
+		{784737E0-6E48-491D-6AFA-A4A4F3C135A4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{784737E0-6E48-491D-6AFA-A4A4F3C135A4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{784737E0-6E48-491D-6AFA-A4A4F3C135A4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{784737E0-6E48-491D-6AFA-A4A4F3C135A4}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {55023DCD-90D7-4A85-97B4-C9B3BA8E66EF}
+	EndGlobalSection
+EndGlobal
