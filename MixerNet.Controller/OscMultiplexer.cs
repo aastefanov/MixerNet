@@ -1,23 +1,22 @@
-﻿using LucHeart.CoreOSC;
-using Nito.AsyncEx;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.IO.Ports;
-using System.Net;
-using System.Text;
-using System.Threading;
 using System.Threading.Tasks;
+using LucHeart.CoreOSC;
+using Nito.AsyncEx;
 
 namespace MixerNet.Controller
 {
-    internal class OscMultiplexer
+    public class OscMultiplexer
     {
-        private IOscClient client;
+        private readonly IOscClient client;
 
-        private Queue<Tuple<IOscPacket, AsyncManualResetEvent>> commands = new Queue<Tuple<IOscPacket, AsyncManualResetEvent>>();
-        private Queue<IOscPacket> responses = new Queue<IOscPacket>();
+        private readonly Queue<Tuple<IOscPacket, AsyncManualResetEvent>> commands =
+            new Queue<Tuple<IOscPacket, AsyncManualResetEvent>>();
 
-        private AsyncLock queueLock = new AsyncLock();
+        private readonly AsyncLock queueLock = new AsyncLock();
+        private readonly Queue<IOscPacket> responses = new Queue<IOscPacket>();
+
+        private readonly AsyncLock commandLock = new AsyncLock();
 
         public OscMultiplexer(IOscClient client)
         {
@@ -32,33 +31,37 @@ namespace MixerNet.Controller
         {
             using (await queueLock.LockAsync())
             {
-                var command = commands.Dequeue();
-
-                //Console.WriteLine("Cmd: {0}, Resp: {1}", command.Item1)
+                var (packet, ev) = commands.Dequeue();
 
                 responses.Enqueue(response);
-                command.Item2.Set();
+                ev.Set();
             }
         }
 
         public async Task<IOscPacket> CommandAsync(string address, params object?[] args)
         {
-            return await SendCommandAsync(new OscMessage(address, args));
+            using (await commandLock.LockAsync())
+            {
+                return await CommandAsync(new OscMessage(address, args));
+            }
         }
 
 
-        public async Task<IOscPacket> SendCommandAsync(IOscPacket command)
+        public async Task<IOscPacket> CommandAsync(IOscPacket command)
         {
             var @event = new AsyncManualResetEvent(false);
             using (await queueLock.LockAsync())
             {
                 commands.Enqueue(new Tuple<IOscPacket, AsyncManualResetEvent>(command, @event));
-                client.Send(command);
+                await client.SendAsync(command);
             }
+
             await @event.WaitAsync();
 
             using (await queueLock.LockAsync())
+            {
                 return responses.Dequeue();
+            }
         }
     }
 }

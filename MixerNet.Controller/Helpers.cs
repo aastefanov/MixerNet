@@ -1,25 +1,17 @@
-﻿using LucHeart.CoreOSC;
-using System;
-using System.Collections.Generic;
+﻿using System;
 using System.Linq;
 using System.Text;
+using LucHeart.CoreOSC;
 
 namespace MixerNet.Controller
 {
-    internal static class Helpers
+    public static class Helpers
     {
         public static IOscPacket ParseOsc(Span<byte> data)
         {
-            if (data.StartsWith(Encoding.ASCII.GetBytes("#bundle").AsSpan()))
-            {
-                var bundle = OscBundle.ParseBundle(data);
-                return bundle;
-            }
-            else
-            {
-                var message = OscMessage.ParseMessage(data);
-                return message;
-            }
+            return data.StartsWith(Encoding.ASCII.GetBytes("#bundle\0").AsSpan())
+                ? OscBundle.ParseBundle(data)
+                : OscMessage.ParseMessage(data) as IOscPacket;
         }
 
         public static OscMessage? Find(this OscBundle bundle, string address)

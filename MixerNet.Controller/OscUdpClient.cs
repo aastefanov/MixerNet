@@ -1,9 +1,9 @@
-﻿using LucHeart.CoreOSC;
-using System;
+﻿using System;
 using System.Net;
 using System.Net.Sockets;
 using System.Threading;
 using System.Threading.Tasks;
+using LucHeart.CoreOSC;
 
 namespace MixerNet.Controller
 {
@@ -14,16 +14,11 @@ namespace MixerNet.Controller
 
         public OscUdpClient(IPEndPoint remote, CancellationToken? token = null)
         {
-            this.client = new UdpClient();
+            client = new UdpClient();
             this.remote = remote;
-
         }
 
-        public event EventHandler<IOscPacket> PacketReceived;
-
-        public void Close()
-        {
-        }
+        public event EventHandler<IOscPacket>? PacketReceived;
 
         public void Open(CancellationToken? token = null)
         {
@@ -31,7 +26,7 @@ namespace MixerNet.Controller
             Task.Run(async () =>
             {
                 while (true)
-                //while ((bool)!token?.IsCancellationRequested)
+                    //while ((bool)!token?.IsCancellationRequested)
                 {
                     var data = await client.ReceiveAsync();
                     PacketReceived?.Invoke(this, Helpers.ParseOsc(data.Buffer));
@@ -47,6 +42,10 @@ namespace MixerNet.Controller
         public async Task SendAsync(IOscPacket data)
         {
             await client.SendAsync(data.GetBytes(), data.GetBytes().Length);
+        }
+
+        public void Close()
+        {
         }
     }
 }

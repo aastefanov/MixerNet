@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "MixerNet.Cli": {
+      "commandName": "Project",
+      "commandLineArgs": "draw-vu"
+    }
+  }
+}

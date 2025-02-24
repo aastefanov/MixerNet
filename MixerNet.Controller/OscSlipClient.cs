@@ -1,10 +1,12 @@
-﻿using LucHeart.CoreOSC;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.IO.Ports;
+using System.Linq;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using LucHeart.CoreOSC;
+using Nito.AsyncEx;
 
 namespace MixerNet.Controller
 {
@@ -15,80 +17,23 @@ namespace MixerNet.Controller
         private static readonly byte ESC_END = (byte)'\xdc';
         private static readonly byte ESC_ESC = (byte)'\xdd';
 
-        private readonly SerialPort port;
+        private readonly RingBuffer<byte> buffer = new RingBuffer<byte>(1024);
+        private readonly byte[] scratch = new byte[1024];
 
-        public event EventHandler<IOscPacket> PacketReceived;
+
+        private readonly AsyncLock serialLock = new AsyncLock();
+
+        private readonly SerialPort port;
+        private event EventHandler<int> SerialPacketReceived;
+
 
         public OscSlipClient(SerialPort port)
         {
             this.port = port;
 
-            port.DataReceived += OnDataReceived;
-        }
+            port.DataReceived += async (s, e) => await ReadToEnd();
 
-        private Span<byte> ReadToEnd()
-        {
-            var len = port.BytesToRead;
-
-            // TODO: Don't read byte by byte
-
-            int b = 0;
-            byte[] buffer = new byte[len];
-            for (int read = 0; read < len; read++)
-            {
-                byte c = (byte)port.ReadByte();
-
-                if (c == END)
-                {
-                    if (b > 0) break;
-                }
-                else if (c == ESC)
-                {
-                    read++;
-                    byte c2 = (byte)port.ReadByte();
-                    if (c2 == ESC_END) buffer[b++] = END;
-                    else if (c2 == ESC_ESC) buffer[b++] = ESC;
-                }
-                else
-                {
-                    buffer[b++] = c;
-                }
-
-            }
-
-            return buffer;
-        }
-
-        private void OnDataReceived(object sender, SerialDataReceivedEventArgs e)
-        {
-            var data = this.ReadToEnd();
-
-            PacketReceived?.Invoke(this, Helpers.ParseOsc(data));
-        }
-
-        public void Send(IOscPacket data)
-        {
-
-            // TODO: Don't go byte by byte
-
-            Span<byte> bytes = data.GetBytes();
-
-            List<byte> result = new List<byte>(bytes.Length + 10);
-
-
-            result.Add(END);
-
-            for (int i = 0; i < bytes.Length; i++)
-            {
-                if (bytes[i] == ESC) result.AddRange(new[] { ESC, ESC_ESC });
-                else if (bytes[i] == END) result.AddRange(new[] { ESC, ESC_END });
-                else result.Add(bytes[i]);
-            }
-
-            result.Add(END);
-
-            var final = result.ToArray();
-            port.Write(final, 0, final.Length);
+            SerialPacketReceived += async (s, e) => await OnPacketComplete(s, e);
         }
 
         public void Dispose()
@@ -96,19 +41,105 @@ namespace MixerNet.Controller
             port.Dispose();
         }
 
+        public event EventHandler<IOscPacket>? PacketReceived;
+
+        public void Send(IOscPacket data)
+        {
+            var bytes = data.GetBytes();
+            var final = CreatePacket(bytes).ToArray();
+            port.Write(final, 0, final.Length);
+        }
+
         public void Open(CancellationToken? token = null)
         {
             port.Open();
+            port.DiscardInBuffer();
+        }
+
+        public Task SendAsync(IOscPacket data)
+        {
+            return Task.Run(() => Send(data));
+        }
+
+
+        private async Task OnPacketComplete(object sender, int e)
+        {
+            using (await serialLock.LockAsync())
+            {
+                var data = buffer.Read(e).ToArray();
+                buffer.DecrementCount(e);
+
+                var packet = Helpers.ParseOsc(data);
+                PacketReceived?.Invoke(this, packet);
+            }
+        }
+
+        private async Task ReadToEnd()
+        {
+            using (await serialLock.LockAsync())
+            {
+                var initialCount = buffer.Count;
+
+                while (port.BytesToRead > 0)
+                {
+                    var len = Math.Min(port.BytesToRead, scratch.Length);
+
+                    port.Read(scratch, 0, len);
+                    // var buf = Encoding.UTF8.GetBytes(port.ReadExisting());
+
+                    for (var i = 0; i < len; i++)
+                    {
+                        if (scratch[i] == END)
+                        {
+                            // this is the end, not the beginning of a packet
+                            if (buffer.Count - initialCount > 0)
+                            {
+                                SerialPacketReceived?.Invoke(this, (buffer.Count - initialCount));
+                                return;
+                            }
+                        }
+                        else if (scratch[i] == ESC)
+                        {
+                            // TODO: make sure this doesn't break
+                            var c2 = scratch[++i];
+                            if (c2 == ESC_END) buffer.Add(END);
+                            else if (c2 == ESC_ESC) buffer.Add(ESC);
+                        }
+                        else
+                        {
+                            buffer.Add(scratch[i]);
+                        }
+                    }
+                }
+            }
+        }
+
+
+        private IEnumerable<byte> CreatePacket(byte[] source)
+        {
+            yield return END;
+            foreach (var t in source)
+                if (t == ESC)
+                {
+                    yield return ESC;
+                    yield return ESC_ESC;
+                }
+                else if (t == END)
+                {
+                    yield return ESC;
+                    yield return ESC_END;
+                }
+                else
+                {
+                    yield return t;
+                }
+
+            yield return END;
         }
 
         public void Close()
         {
             port.Close();
-        }
-
-        public Task SendAsync(IOscPacket data)
-        {
-            return Task.Run(() => this.Send(data));
         }
     }
 }
