@@ -6,15 +6,17 @@
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
         <PublishAot>True</PublishAot>
-    </PropertyGroup>
+        <AssemblyName>mixercli</AssemblyName>
+		<PublishDir>../build</PublishDir>
+	</PropertyGroup>
 
     <ItemGroup>
-        <PackageReference Include="Spectre.Console" Version="0.49.1"/>
-        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1"/>
+        <PackageReference Include="Spectre.Console" Version="0.49.1" />
+        <PackageReference Include="System.CommandLine" Version="2.0.0-beta4.22272.1" />
     </ItemGroup>
 
     <ItemGroup>
-        <ProjectReference Include="..\MixerNet.Controller\MixerNet.Controller.csproj"/>
+        <ProjectReference Include="..\MixerNet.Controller\MixerNet.Controller.csproj" />
     </ItemGroup>
 
 </Project>

@@ -23,7 +23,7 @@ namespace MixerNet.Controller
 
         public OscController(SerialPort port) : this(new OscMultiplexer(new OscSlipClient(port)))
         {
-            Remote = port.ToString();
+            Remote = port.PortName;
         }
 
         public OscController(IPEndPoint remote) : this(new OscMultiplexer(new OscUdpClient(remote)))

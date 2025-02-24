@@ -53,6 +53,10 @@ partial class Cli
         var udpOption = new Option<string>("host", () => "127.0.0.1:10024");
         var serialPort = serialOption.Parse(args).GetValueForOption(serialOption);
         var udpHost = udpOption.Parse(args).GetValueForOption(udpOption);
+
+        root.AddGlobalOption(serialOption);
+        root.AddGlobalOption(udpOption);
+
         if (!string.IsNullOrEmpty(serialPort)) mixer = new OscController(new SerialPort(serialPort));
         else mixer = new OscController(IPEndPoint.Parse(udpHost ?? "127.0.0.1:10024"));
 

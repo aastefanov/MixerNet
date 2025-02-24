@@ -26,8 +26,8 @@ namespace MixerNet.Controller
             Task.Run(async () =>
             {
                 while (true)
-                    //while ((bool)!token?.IsCancellationRequested)
                 {
+                    // TODO: Add timeouts
                     var data = await client.ReceiveAsync();
                     PacketReceived?.Invoke(this, Helpers.ParseOsc(data.Buffer));
                 }
