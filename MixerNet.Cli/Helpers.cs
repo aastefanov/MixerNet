@@ -18,24 +18,6 @@ public static class Helpers
     //    return root;
     //}
 
-    public static async Task<IEnumerable<TResult>> SelectAsync<TSource, TResult>(
-        this IEnumerable<TSource> source, Func<TSource, Task<TResult>> method)
-    {
-        return await Task.WhenAll(source.Select(async s => await method(s)));
-    }
-
-    public static void Each<T>(this IEnumerable<T> ie, Action<T, int> action)
-    {
-        var i = 0;
-        foreach (var e in ie) action(e, i++);
-    }
-
-    public static IEnumerable<Tuple<T, int>> Enumerate<T>(this IEnumerable<T> ie)
-    {
-        var i = 0;
-        foreach (var e in ie) yield return new Tuple<T, int>(e, i++);
-    }
-
     public static Command AddArguments(this Command command, params Argument[] args)
     {
         foreach (var arg in args) command.AddArgument(arg);

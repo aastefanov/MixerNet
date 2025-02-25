@@ -3,14 +3,74 @@
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:vm="clr-namespace:MixerNet.Avalonia.ViewModels"
+             xmlns:converters="clr-namespace:MixerNet.Avalonia.Converters"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
              x:Class="MixerNet.Avalonia.Views.MainView"
              x:DataType="vm:MainViewModel">
-  <Design.DataContext>
-    <!-- This only sets the DataContext for the previewer in an IDE,
+    <UserControl.Resources>
+        <converters:GainColorConverter x:Key="GainColorConverter" />
+    </UserControl.Resources>
+    <Design.DataContext>
+        <!-- This only sets the DataContext for the previewer in an IDE,
          to set the actual DataContext for runtime, set the DataContext property in code (look at App.axaml.cs) -->
-    <vm:MainViewModel />
-  </Design.DataContext>
+        <vm:MainViewModel />
+    </Design.DataContext>
 
-  <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+    <Grid RowDefinitions="*,*" ColumnDefinitions="*,*">
+        <TextBlock Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2" Margin="20"
+                   FontSize="30"
+                   HorizontalAlignment="Center">
+            Shanomixer
+        </TextBlock>
+
+        <ItemsControl ItemsSource="{Binding Inputs}" Grid.Row="1" Grid.Column="0">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"></StackPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Slider HorizontalAlignment="Center" Orientation="Vertical" Height="200"
+                                    Value="{Binding Gain}"
+                                    Minimum="0"
+                                    Maximum="1.8" />
+                            <ProgressBar Orientation="Vertical" HorizontalAlignment="Center" Height="200"
+                                         Minimum="-60" Maximum="+4"
+                                         Value="{Binding Gain }"
+                                         Foreground="{Binding Gain, Converter={StaticResource GainColorConverter}}">
+                            </ProgressBar>
+                        </StackPanel>
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+
+        <ItemsControl ItemsSource="{Binding Outputs}" Grid.Row="1" Grid.Column="1">
+            <ItemsControl.ItemsPanel>
+                <ItemsPanelTemplate>
+                    <StackPanel Orientation="Horizontal"></StackPanel>
+                </ItemsPanelTemplate>
+            </ItemsControl.ItemsPanel>
+            <ItemsControl.ItemTemplate>
+                <DataTemplate>
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <Slider HorizontalAlignment="Center" Orientation="Vertical" Value="{Binding Gain}"
+                                    Minimum="0"
+                                    Maximum="1.8" Height="200" />
+                            <ProgressBar Orientation="Vertical" HorizontalAlignment="Center"
+                                         Minimum="-60" Maximum="+4" Height="200" Value="{Binding Gain }"
+                                         Foreground="{Binding Gain, Converter={StaticResource GainColorConverter}}">
+                            </ProgressBar>
+                        </StackPanel>
+                        <TextBlock Text="{Binding Name}" HorizontalAlignment="Center" />
+                    </StackPanel>
+                </DataTemplate>
+            </ItemsControl.ItemTemplate>
+        </ItemsControl>
+    </Grid>
+    <!-- <TextBlock Text="{Binding Greeting}" HorizontalAlignment="Center" VerticalAlignment="Center" /> -->
 </UserControl>

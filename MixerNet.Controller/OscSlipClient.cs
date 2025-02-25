@@ -38,6 +38,7 @@ namespace MixerNet.Controller
 
         public void Dispose()
         {
+            Close();
             port.Dispose();
         }
 
@@ -52,6 +53,8 @@ namespace MixerNet.Controller
 
         public void Open(CancellationToken? token = null)
         {
+            // port.Close();
+            // Task.Delay(1000).Wait();
             port.Open();
             port.DiscardInBuffer();
         }
@@ -141,5 +144,7 @@ namespace MixerNet.Controller
         {
             port.Close();
         }
+        
+        
     }
 }

@@ -1,6 +1,9 @@
-﻿namespace MixerNet.Avalonia.ViewModels;
+﻿using System.Collections.Generic;
+using MixerNet.Avalonia.Models;
+
+namespace MixerNet.Avalonia.ViewModels;
 
 public class MainViewModel : ViewModelBase
-{
-    public string Greeting => "Welcome to Avalonia!";
-}
+    {
+        public required Mixer Mixer { get; set; }
+    }

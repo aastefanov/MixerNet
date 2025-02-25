@@ -1,4 +1,5 @@
 ﻿using System.CommandLine;
+using MixerNet.Controller;
 using Spectre.Console;
 
 namespace MixerNet.Cli;
